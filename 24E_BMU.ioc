@@ -1,10 +1,11 @@
 #MicroXplorer Configuration settings - do not modify
 ADC1.Channel-0\#ChannelRegularConversion=ADC_CHANNEL_1
 ADC1.ContinuousConvMode=DISABLE
-ADC1.IPParameters=Rank-0\#ChannelRegularConversion,master,Channel-0\#ChannelRegularConversion,SamplingTime-0\#ChannelRegularConversion,NbrOfConversionFlag,ContinuousConvMode
+ADC1.IPParameters=Rank-0\#ChannelRegularConversion,master,Channel-0\#ChannelRegularConversion,SamplingTime-0\#ChannelRegularConversion,NbrOfConversionFlag,ContinuousConvMode,ScanConvMode
 ADC1.NbrOfConversionFlag=1
 ADC1.Rank-0\#ChannelRegularConversion=1
 ADC1.SamplingTime-0\#ChannelRegularConversion=ADC_SAMPLETIME_3CYCLES
+ADC1.ScanConvMode=ADC_SCAN_ENABLE
 ADC1.master=1
 CAD.formats=
 CAD.pinconfig=
@@ -227,8 +228,8 @@ ProjectManager.MainLocation=Core/Src
 ProjectManager.NoMain=false
 ProjectManager.PreviousToolchain=
 ProjectManager.ProjectBuild=false
-ProjectManager.ProjectFileName=BMU.ioc
-ProjectManager.ProjectName=BMU
+ProjectManager.ProjectFileName=24E_BMU.ioc
+ProjectManager.ProjectName=24E_BMU
 ProjectManager.ProjectStructure=
 ProjectManager.RegisterCallBack=
 ProjectManager.StackSize=0x400
