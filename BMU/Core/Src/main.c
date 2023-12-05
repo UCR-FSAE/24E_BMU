@@ -270,22 +270,27 @@ int main(void)
         }
     }
 
+  void CollectADCData()
+  {
+	  for(int i = 0; i< Max_Channels; i++)
+	  {
+		  select_adc_channel(i+1);
+	  	  HAL_ADC_Start(&hadc1);
+	  	  HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+	  	  adcValue[i] = HAL_ADC_GetValue(&hadc1) % 4;
+	  	  HAL_ADC_Stop(&hadc1);
+
+	  }
+  }
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  for(int i = 0; i< Max_Channels; i++)
-	 	  	  {
-	 		  	  select_adc_channel(i+1);
-	 	          HAL_ADC_Start(&hadc1);
-	 	          HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-	 	          adcValue[i] = HAL_ADC_GetValue(&hadc1) % 4;
-	 	          HAL_ADC_Stop(&hadc1);
-
-	 	       }
-	 	       HAL_Delay(1);
+	  CollectADCData();
+	  HAL_Delay(100);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
