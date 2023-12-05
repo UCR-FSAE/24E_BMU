@@ -36,6 +36,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
+int Max_Channels = 16;
 
 /* USER CODE END PM */
 
@@ -46,6 +47,7 @@ CAN_HandleTypeDef hcan1;
 CAN_HandleTypeDef hcan2;
 
 /* USER CODE BEGIN PV */
+uint16_t adcValue[16];
 
 /* USER CODE END PV */
 
@@ -71,8 +73,7 @@ static void MX_CAN2_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	int Max_Channels = 16;
-	uint16_t adcValue[Max_Channels];
+
 
   /* USER CODE END 1 */
 
@@ -280,7 +281,7 @@ int main(void)
 	 		  	  select_adc_channel(i+1);
 	 	          HAL_ADC_Start(&hadc1);
 	 	          HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-	 	          adcValue[i] = HAL_ADC_GetValue(&hadc1);
+	 	          adcValue[i] = HAL_ADC_GetValue(&hadc1) % 4;
 	 	          HAL_ADC_Stop(&hadc1);
 
 	 	       }
