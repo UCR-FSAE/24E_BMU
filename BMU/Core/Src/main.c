@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -46,8 +46,17 @@ ADC_HandleTypeDef hadc1;
 CAN_HandleTypeDef hcan1;
 CAN_HandleTypeDef hcan2;
 
+SPI_HandleTypeDef hspi3;
+
 /* USER CODE BEGIN PV */
 uint16_t adcValue[16];
+const uint8_t EEPROM_READ = 0b00000011;
+const uint8_t EEPROM_WRITE = 0b00000010;
+const uint8_t EEPROM_WRDI = 0b00000100;
+const uint8_t EEPROM_WREN = 0b00000110;
+const uint8_t EEPROM_RDSR = 0b00000101;
+const uint8_t EEPROM_WRSR = 0b00000001;
+
 
 /* USER CODE END PV */
 
@@ -57,6 +66,7 @@ static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_CAN1_Init(void);
 static void MX_CAN2_Init(void);
+static void MX_SPI3_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -67,13 +77,13 @@ static void MX_CAN2_Init(void);
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  char spi_buf[20];
 
   /* USER CODE END 1 */
 
@@ -98,190 +108,204 @@ int main(void)
   MX_ADC1_Init();
   MX_CAN1_Init();
   MX_CAN2_Init();
+  MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
   void select_adc_channel(int channel)
+  {
+    ADC_ChannelConfTypeDef sConfig = {0};
+    sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
+    switch (channel)
     {
-        ADC_ChannelConfTypeDef sConfig = {0};
-        sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
-        switch (channel)
-        {
-            case 1:
-                sConfig.Channel = ADC_CHANNEL_0;
-                sConfig.Rank = 1;
+    case 1:
+      sConfig.Channel = ADC_CHANNEL_0;
+      sConfig.Rank = 1;
 
-                if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                {
-                  Error_Handler();
-                }
-                break;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
 
-            case 2:
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-                  sConfig.Channel = ADC_CHANNEL_1;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-            case 3:
-                  sConfig.Channel = ADC_CHANNEL_2;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-            case 4:
-                  sConfig.Channel = ADC_CHANNEL_3;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-            case 5:
-                  sConfig.Channel = ADC_CHANNEL_4;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-            case 6:
-                  sConfig.Channel = ADC_CHANNEL_5;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-            case 7:
-                  sConfig.Channel = ADC_CHANNEL_6;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-            case 8:
-                  sConfig.Channel = ADC_CHANNEL_7;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-            case 9:
-                  sConfig.Channel = ADC_CHANNEL_8;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-            case 10:
-                  sConfig.Channel = ADC_CHANNEL_9;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-            case 11:
-                  sConfig.Channel = ADC_CHANNEL_10;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-            case 12:
-                  sConfig.Channel = ADC_CHANNEL_11;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-            case 13:
-                  sConfig.Channel = ADC_CHANNEL_12;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-            case 14:
-                  sConfig.Channel = ADC_CHANNEL_13;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
-                  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-                  */
-            case 15:
-                  sConfig.Channel = ADC_CHANNEL_14;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
+    case 2:
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+      sConfig.Channel = ADC_CHANNEL_1;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+    case 3:
+      sConfig.Channel = ADC_CHANNEL_2;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+    case 4:
+      sConfig.Channel = ADC_CHANNEL_3;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+    case 5:
+      sConfig.Channel = ADC_CHANNEL_4;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+    case 6:
+      sConfig.Channel = ADC_CHANNEL_5;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+    case 7:
+      sConfig.Channel = ADC_CHANNEL_6;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+    case 8:
+      sConfig.Channel = ADC_CHANNEL_7;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+    case 9:
+      sConfig.Channel = ADC_CHANNEL_8;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+    case 10:
+      sConfig.Channel = ADC_CHANNEL_9;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+    case 11:
+      sConfig.Channel = ADC_CHANNEL_10;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+    case 12:
+      sConfig.Channel = ADC_CHANNEL_11;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+    case 13:
+      sConfig.Channel = ADC_CHANNEL_12;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+    case 14:
+      sConfig.Channel = ADC_CHANNEL_13;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
+      /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+       */
+    case 15:
+      sConfig.Channel = ADC_CHANNEL_14;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
 
-            case 16:
-                  sConfig.Channel = ADC_CHANNEL_15;
-                  sConfig.Rank = 1;
-                  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-                  {
-                    Error_Handler();
-                  }
-                  break;
+    case 16:
+      sConfig.Channel = ADC_CHANNEL_15;
+      sConfig.Rank = 1;
+      if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      break;
 
-            default:
-                break;
-        }
+    default:
+      break;
     }
+  }
 
   void CollectADCData()
   {
-	  for(int i = 0; i< Max_Channels; i++)
-	  {
-		  select_adc_channel(i+1);
-	  	  HAL_ADC_Start(&hadc1);
-	  	  HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-	  	  adcValue[i] = HAL_ADC_GetValue(&hadc1) % 4;
-	  	  HAL_ADC_Stop(&hadc1);
-
-	  }
+    for (int i = 0; i < Max_Channels; i++)
+    {
+      select_adc_channel(i + 1);
+      HAL_ADC_Start(&hadc1);
+      HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+      adcValue[i] = HAL_ADC_GetValue(&hadc1) % 4;
+      HAL_ADC_Stop(&hadc1);
+    }
   }
+  // CS pin should default high
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);
+
+  // Enable write enable latch
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
+  HAL_SPI_Transmit(&hspi3, (uint8_t*)&EEPROM_WREN, 1 , 100);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);
+
+  // Read status register
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
+  HAL_SPI_Transmit(&hspi3, (uint8_t*)&EEPROM_RDSR, 1 , 100);
+  HAL_SPI_Receive(&hspi3, (uint8_t*)spi_buf, 1 , 100);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);
+
 
   /* USER CODE END 2 */
 
@@ -289,8 +313,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  CollectADCData();
-	  HAL_Delay(100);
+//    CollectADCData();
+//    HAL_Delay(100);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -299,22 +323,22 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-  */
+   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
 
   /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+   * in the RCC_OscInitTypeDef structure.
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -325,9 +349,8 @@ void SystemClock_Config(void)
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -340,10 +363,10 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief ADC1 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief ADC1 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_ADC1_Init(void)
 {
 
@@ -351,14 +374,14 @@ static void MX_ADC1_Init(void)
 
   /* USER CODE END ADC1_Init 0 */
 
-//  ADC_ChannelConfTypeDef sConfig = {0};
+  ADC_ChannelConfTypeDef sConfig = {0};
 
   /* USER CODE BEGIN ADC1_Init 1 */
 
   /* USER CODE END ADC1_Init 1 */
 
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
-  */
+   */
   hadc1.Instance = ADC1;
   hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
@@ -377,25 +400,24 @@ static void MX_ADC1_Init(void)
   }
 
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-//  sConfig.Channel = ADC_CHANNEL_1;
-//  sConfig.Rank = ADC_REGULAR_RANK_1;
-//  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-//  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
+   */
+  sConfig.Channel = ADC_CHANNEL_1;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN ADC1_Init 2 */
 
   /* USER CODE END ADC1_Init 2 */
-
 }
 
 /**
-  * @brief CAN1 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief CAN1 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_CAN1_Init(void)
 {
 
@@ -425,14 +447,13 @@ static void MX_CAN1_Init(void)
   /* USER CODE BEGIN CAN1_Init 2 */
 
   /* USER CODE END CAN1_Init 2 */
-
 }
 
 /**
-  * @brief CAN2 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief CAN2 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_CAN2_Init(void)
 {
 
@@ -462,19 +483,57 @@ static void MX_CAN2_Init(void)
   /* USER CODE BEGIN CAN2_Init 2 */
 
   /* USER CODE END CAN2_Init 2 */
-
 }
 
 /**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief SPI3 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_SPI3_Init(void)
+{
+
+  /* USER CODE BEGIN SPI3_Init 0 */
+
+  /* USER CODE END SPI3_Init 0 */
+
+  /* USER CODE BEGIN SPI3_Init 1 */
+
+  /* USER CODE END SPI3_Init 1 */
+  /* SPI3 parameter configuration*/
+  hspi3.Instance = SPI3;
+  hspi3.Init.Mode = SPI_MODE_MASTER;
+  hspi3.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi3.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi3.Init.NSS = SPI_NSS_SOFT;
+  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+  hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi3.Init.CRCPolynomial = 7;
+  hspi3.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
+  hspi3.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
+  if (HAL_SPI_Init(&hspi3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI3_Init 2 */
+
+  /* USER CODE END SPI3_Init 2 */
+}
+
+/**
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -485,10 +544,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LD3_Pin|LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, LD3_Pin | LD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOG, USB_PowerSwitchOn_Pin | GPIO_PIN_10, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : USER_Btn_Pin */
   GPIO_InitStruct.Pin = USER_Btn_Pin;
@@ -505,26 +564,26 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(RMII_TXD1_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LD3_Pin LD2_Pin */
-  GPIO_InitStruct.Pin = LD3_Pin|LD2_Pin;
+  GPIO_InitStruct.Pin = LD3_Pin | LD2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : STLK_RX_Pin STLK_TX_Pin */
-  GPIO_InitStruct.Pin = STLK_RX_Pin|STLK_TX_Pin;
+  GPIO_InitStruct.Pin = STLK_RX_Pin | STLK_TX_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF7_USART3;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : USB_PowerSwitchOn_Pin */
-  GPIO_InitStruct.Pin = USB_PowerSwitchOn_Pin;
+  /*Configure GPIO pins : USB_PowerSwitchOn_Pin PG10 */
+  GPIO_InitStruct.Pin = USB_PowerSwitchOn_Pin | GPIO_PIN_10;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(USB_PowerSwitchOn_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
   /*Configure GPIO pin : USB_OverCurrent_Pin */
   GPIO_InitStruct.Pin = USB_OverCurrent_Pin;
@@ -533,7 +592,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : USB_SOF_Pin USB_ID_Pin USB_DM_Pin USB_DP_Pin */
-  GPIO_InitStruct.Pin = USB_SOF_Pin|USB_ID_Pin|USB_DM_Pin|USB_DP_Pin;
+  GPIO_InitStruct.Pin = USB_SOF_Pin | USB_ID_Pin | USB_DM_Pin | USB_DP_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -547,15 +606,15 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(USB_VBUS_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : RMII_TX_EN_Pin RMII_TXD0_Pin */
-  GPIO_InitStruct.Pin = RMII_TX_EN_Pin|RMII_TXD0_Pin;
+  GPIO_InitStruct.Pin = RMII_TX_EN_Pin | RMII_TXD0_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
@@ -563,9 +622,9 @@ static void MX_GPIO_Init(void)
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -577,14 +636,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
