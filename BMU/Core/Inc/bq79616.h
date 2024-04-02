@@ -46,26 +46,26 @@
 // FUNCTION PROTOTYPES
 void SpiAutoAddress();
 
-int SpiWriteReg(BYTE bID, uint16 wAddr, uint64 dwData, BYTE bLen, BYTE bWriteType);
-int SpiWriteFrame(uint16 bID, uint16 wAddr, uint16 *pData, uint16 bLen, uint8 bWriteType);
-int SpiReadReg(BYTE bID, uint16 wAddr, uint16 *pData, BYTE bLen, uint32 dwTimeOut, BYTE bWriteType);
+int SpiWriteReg(BYTE bID, uint16_t wAddr, uint64 dwData, BYTE bLen, BYTE bWriteType);
+int SpiWriteFrame(uint16_t bID, uint16_t wAddr, uint16_t *pData, uint16_t bLen, uint8 bWriteType);
+int SpiReadReg(BYTE bID, uint16_t wAddr, uint16_t *pData, BYTE bLen, uint32 dwTimeOut, BYTE bWriteType);
 
-uint32 SpiCRC16(uint16 *pBuf, int nLen);
+uint32 SpiCRC16(uint16_t *pBuf, int nLen);
 
-void delayus(uint16 us);
-void delayms(uint16 ms);
+void delayus(uint16_t us);
+void delayms(uint16_t ms);
 
 void SpiDisableTimeout_600_616(void);
 
-float Complement(uint16 rawData, float multiplier);
+float Complement(uint16_t rawData, float multiplier);
 BOOL GetFaultStat();
 uint16_t volt2Byte(float volt);
 
 unsigned printConsole(const char *_format, ...);
 
 // SPI variables
-spiDAT1_t dataconfig1_t;
-uint16 FFBuffer[128];
+spiDAT1_t dataconfig1_t; // FROM SL: Take out?
+uint16_t FFBuffer[128];
 
 #endif /* BQ79606_H_ */
 // EOF

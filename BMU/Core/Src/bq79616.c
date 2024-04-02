@@ -15,13 +15,14 @@
 
 /* From SL
     TODO:
-    - Replace all instances of SPI transmit/transmitreceive/receive with STM HAL versions
+    - Redo spireadreg and spiwriteframe to have STM HAL functions
+    - Redo autoaddress function to have STM HAL functions and fit the amount of boards we have
     - Replace all instances of delayms with STM HAL versions
     - Make new version of delayus
-    - Change all uints to match STM versions DONE
+    - DONE Change all uints to match STM versions
     - Replace all instances of gioGetBit with STM HAL versions/figure out how pin works with BQ79600 datasheet
     - Get rid of uneccesary functions, variables and includes from TI microcontroller
-    - Remake wake functions
+    - Remake "PINGS" functions
 */
 
 #include <bq79616.h>
