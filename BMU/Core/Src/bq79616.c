@@ -13,6 +13,17 @@
  **
  ******************************************************************************/
 
+/* From SL
+    TODO:
+    - Replace all instances of SPI transmit/transmitreceive/receive with STM HAL versions
+    - Replace all instances of delayms with STM HAL versions
+    - Make new version of delayus
+    - Change all uints to match STM versions
+    - Replace all instances of gioGetBit with STM HAL versions/figure out how pin works with BQ79600 datasheet
+    - Get rid of uneccesary functions, variables and includes from TI microcontroller
+    - Remake wake functions
+*/
+
 #include <bq79616.h>
 #include <bq79600.h>
 #include "string.h"
@@ -66,7 +77,7 @@ int K = 0; // number of bytes remaining in the last group of 128
 // PINGS
 //******
 
-// REDO OR Make alternative of these
+// FROM SL: REDO OR Make alternative of these
 
 void SpiWake79600(void)
 {
@@ -177,7 +188,7 @@ int SpiWriteReg(BYTE bID, uint16 wAddr, uint64 dwData, BYTE bLen, BYTE bWriteTyp
     // device address, register start address, data bytes, data length, write type (single, broadcast, stack)
     bRes = 0;
     memset(spiBuf, 0, sizeof(spiBuf));
-    while (gioGetBit(gioPORTA, 1) == 0) // What is this pin suppose to be?
+    while (gioGetBit(gioPORTA, 1) == 0) // FROM SL: What is this pin suppose to be?
         delayus(5);                     // wait until SPI_RDY is ready
     switch (bLen)
     {
@@ -501,7 +512,7 @@ uint16_t volt2Byte(float volt)
     return (uint16_t) ~((int16_t)((-volt / 0.00019073) - 1.0));
 }
 
-unsigned printConsole(const char *_format, ...) // Comment this out?
+unsigned printConsole(const char *_format, ...) // FROM SL: Take out? May be uneccesary
 {
     char str[128];
     int length = -1, k = 0;
