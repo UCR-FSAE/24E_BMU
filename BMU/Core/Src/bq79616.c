@@ -59,8 +59,7 @@ BYTE *currCRC;
 int crc_i = 0;
 uint16_t wCRC2 = 0xFFFF;
 int crc16_i = 0;
-asdfasd
-    uint16_t autoaddr_response_frame[(1 + 6) * TOTALBOARDS]; // response frame for auto-addressing sequence
+uint16_t autoaddr_response_frame[(1 + 6) * TOTALBOARDS]; // response frame for auto-addressing sequence
 int numReads = 0;
 int channel = 0;
 
