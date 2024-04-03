@@ -15,7 +15,7 @@
 
 /* From SL
     TODO:
-    - Possibly move over everything to main.c???
+    - Redo spiwritereg to have STM HAL functions
     - Redo spireadreg to have STM HAL functions
     - Redo spiwriteframe to have STM HAL functions (How do you access things from spi handler from main?)
     - Redo autoaddress function to have STM HAL functions and fit the amount of boards we have
@@ -36,7 +36,9 @@
 #include "gio.h" // FROM SL: TI functions used in wake functions, may take out
 #include "datatypes.h"
 #include "stdarg.h"
+#include "main.h"
 
+HAL_SPI_Transmit(&hspi3, (uint8_t *)&EEPROM_RDSR, 1, HAL_MAX_DELAY);
 // GLOBAL VARIABLES (use these to avoid stack overflows by creating too many function variables)
 // avoid creating variables/arrays in functions, or you will run out of stack space quickly
 uint16_t response_frame2[(MAXBYTES + 6) * TOTALBOARDS]; // response frame to be used by every read
@@ -58,8 +60,8 @@ BYTE *currCRC;
 int crc_i = 0;
 uint16_t wCRC2 = 0xFFFF;
 int crc16_i = 0;
-
-uint16_t autoaddr_response_frame[(1 + 6) * TOTALBOARDS]; // response frame for auto-addressing sequence
+asdfasd
+    uint16_t autoaddr_response_frame[(1 + 6) * TOTALBOARDS]; // response frame for auto-addressing sequence
 int numReads = 0;
 int channel = 0;
 

@@ -18,6 +18,7 @@
 #define BQ79616_H_
 
 #include "datatypes.h"
+#include "main.h"
 // #include "hal_stdtypes.h"
 // #include "spi.h"
 
