@@ -30,15 +30,14 @@
 #include <bq79616.h>
 #include <bq79600.h>
 #include "string.h"
-#include "sci.h" // FROM SL: TI functions used in printConsole function, may take out
-#include "spi.h" // FROM SL: TI functions used in SPI functions, may take out
-#include "rti.h" // FROM SL: TI function used in delay functions, may take out
-#include "gio.h" // FROM SL: TI functions used in wake functions, may take out
+// #include "sci.h" // FROM SL: TI functions used in printConsole function, may take out
+// #include "spi.h" // FROM SL: TI functions used in SPI functions, may take out
+// #include "rti.h" // FROM SL: TI function used in delay functions, may take out
+// #include "gio.h" // FROM SL: TI functions used in wake functions, may take out
 #include "datatypes.h"
 #include "stdarg.h"
 #include "main.h"
 
-HAL_SPI_Transmit(&hspi3, (uint8_t *)&EEPROM_RDSR, 1, HAL_MAX_DELAY);
 // GLOBAL VARIABLES (use these to avoid stack overflows by creating too many function variables)
 // avoid creating variables/arrays in functions, or you will run out of stack space quickly
 uint16_t response_frame2[(MAXBYTES + 6) * TOTALBOARDS]; // response frame to be used by every read
@@ -286,7 +285,8 @@ int SpiWriteFrame(uint16_t bID, uint16_t wAddr, uint16_t *pData, uint16_t bLen, 
     *spiPBuf++ = (spiWCRC & 0xFF00) >> 8;
     spiPktLen += 2;
 
-    spiTransmitData(spiREG3, &dataconfig1_t, spiPktLen, spiFrame); // Replace all instances of this with STM HAL ver
+    // spiTransmitData(spiREG3, &dataconfig1_t, spiPktLen, spiFrame); // Replace all instances of this with STM HAL ver
+    HAL_SPI_Transmit(&hspi3, spiFrame, spiPktLen, HAL_MAX_DELAY); // FROM SL: Is spiPktLen in correct units??? Number of bytes?
 
     return spiPktLen;
 }
