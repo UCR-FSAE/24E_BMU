@@ -17,9 +17,9 @@
     TODO:
     - Redo spiwritereg to have STM HAL functions
     - Redo spireadreg to have STM HAL functions
-    - Redo spiwriteframe to have STM HAL functions (How do you access things from spi handler from main?)
+    - DONE? Redo spiwriteframe to have STM HAL functions (How do you access things from spi handler from main?)
     - Redo autoaddress function to have STM HAL functions and fit the amount of boards we have
-    - Replace all instances of delayms with STM HAL versions
+    - DONE Replace all instances of delayms with STM HAL versions
     - Make new version of delayus
     - DONE Change all uints to match STM versions
     - Replace all instances of gioGetBit with STM HAL versions/figure out how pin works with BQ79600 datasheet
@@ -100,7 +100,7 @@ void SpiSD79600(void)
     gioToggleBit(spiPORT3, 1U);
     delayus(0.5);
     gioSetBit(spiPORT3, 10U, 0);
-    delayms(13); // Shutdown ping = >12.5ms
+    HAL_Delay(13); // Shutdown ping = >12.5ms
     gioSetBit(spiPORT3, 10U, 1);
     delayus(0.5);
     gioToggleBit(spiPORT3, 1U);
@@ -136,7 +136,7 @@ void SpiAutoAddress()
     SpiWriteReg(0, OTP_ECC_DATAIN1, 0X00, 1, FRMWRT_STK_W);
     SpiWriteReg(0, OTP_ECC_DATAIN2, 0X00, 1, FRMWRT_STK_W);
     SpiWriteReg(0, OTP_ECC_DATAIN3, 0X00, 1, FRMWRT_STK_W);
-    SpiWriteReg(0, OTP_ECC_DATAIN4, 0X00, 1, FRMWRT_STK_W);
+    SpiWriteReg(0, OTP_ECC_DATAIN4, 0X00, 1, FRMWRT_STK_W); // Don't know what to replace "OTP_ECC_DATAINX" with
     SpiWriteReg(0, OTP_ECC_DATAIN5, 0X00, 1, FRMWRT_STK_W);
     SpiWriteReg(0, OTP_ECC_DATAIN6, 0X00, 1, FRMWRT_STK_W);
     SpiWriteReg(0, OTP_ECC_DATAIN7, 0X00, 1, FRMWRT_STK_W);
@@ -197,25 +197,25 @@ int SpiWriteReg(BYTE bID, uint16_t wAddr, uint64_t dwData, BYTE bLen, BYTE bWrit
     {
     case 1:
         spiBuf[0] = dwData & 0x00000000000000FF;
-        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 1, bWriteType); // Replace all instances of this with STM HAL ver
+        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 1, bWriteType);
         break;
     case 2:
         spiBuf[0] = (dwData & 0x000000000000FF00) >> 8;
         spiBuf[1] = dwData & 0x00000000000000FF;
-        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 2, bWriteType); // Replace all instances of this with STM HAL ver
+        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 2, bWriteType);
         break;
     case 3:
         spiBuf[0] = (dwData & 0x0000000000FF0000) >> 16;
         spiBuf[1] = (dwData & 0x000000000000FF00) >> 8;
         spiBuf[2] = dwData & 0x00000000000000FF;
-        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 3, bWriteType); // Replace all instances of this with STM HAL ver
+        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 3, bWriteType);
         break;
     case 4:
         spiBuf[0] = (dwData & 0x00000000FF000000) >> 24;
         spiBuf[1] = (dwData & 0x0000000000FF0000) >> 16;
         spiBuf[2] = (dwData & 0x000000000000FF00) >> 8;
         spiBuf[3] = dwData & 0x00000000000000FF;
-        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 4, bWriteType); // Replace all instances of this with STM HAL ver
+        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 4, bWriteType);
         break;
     case 5:
         spiBuf[0] = (dwData & 0x000000FF00000000) >> 32;
@@ -223,7 +223,7 @@ int SpiWriteReg(BYTE bID, uint16_t wAddr, uint64_t dwData, BYTE bLen, BYTE bWrit
         spiBuf[2] = (dwData & 0x0000000000FF0000) >> 16;
         spiBuf[3] = (dwData & 0x000000000000FF00) >> 8;
         spiBuf[4] = dwData & 0x00000000000000FF;
-        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 5, bWriteType); // Replace all instances of this with STM HAL ver
+        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 5, bWriteType);
         break;
     case 6:
         spiBuf[0] = (dwData & 0x0000FF0000000000) >> 40;
@@ -232,7 +232,7 @@ int SpiWriteReg(BYTE bID, uint16_t wAddr, uint64_t dwData, BYTE bLen, BYTE bWrit
         spiBuf[3] = (dwData & 0x0000000000FF0000) >> 16;
         spiBuf[4] = (dwData & 0x000000000000FF00) >> 8;
         spiBuf[5] = dwData & 0x00000000000000FF;
-        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 6, bWriteType); // Replace all instances of this with STM HAL ver
+        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 6, bWriteType);
         break;
     case 7:
         spiBuf[0] = (dwData & 0x00FF000000000000) >> 48;
@@ -242,7 +242,7 @@ int SpiWriteReg(BYTE bID, uint16_t wAddr, uint64_t dwData, BYTE bLen, BYTE bWrit
         spiBuf[4] = (dwData & 0x0000000000FF0000) >> 16;
         spiBuf[5] = (dwData & 0x000000000000FF00) >> 8;
         spiBuf[6] = dwData & 0x00000000000000FF;
-        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 7, bWriteType); // Replace all instances of this with STM HAL ver
+        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 7, bWriteType);
         break;
     case 8:
         spiBuf[0] = (dwData & 0xFF00000000000000) >> 56;
@@ -253,7 +253,7 @@ int SpiWriteReg(BYTE bID, uint16_t wAddr, uint64_t dwData, BYTE bLen, BYTE bWrit
         spiBuf[5] = (dwData & 0x0000000000FF0000) >> 16;
         spiBuf[6] = (dwData & 0x000000000000FF00) >> 8;
         spiBuf[7] = dwData & 0x00000000000000FF;
-        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 8, bWriteType); // Replace all instances of this with STM HAL ver
+        bRes = SpiWriteFrame(bID, wAddr, spiBuf, 8, bWriteType);
         break;
     default:
         break;
@@ -454,7 +454,7 @@ BOOL GetFaultStat()
     return 1;
 }
 
-void delayus(uint16_t us) // Make new version of this
+void delayus(uint16_t us) // Make new version of this, may need to redo ioc file
 {
     if (us == 0)
         return;
@@ -492,24 +492,24 @@ void delayus(uint16_t us) // Make new version of this
     }
 }
 
-void delayms(uint16_t ms) // Make new version of this
-{
-    if (ms == 0)
-        return;
-    else
-    {
-        rtiREG1->CMP[0U].COMPx = 10000 * ms;
-        rtiREG1->CMP[0U].UDCPx = 10000 * ms;
-        rtiEnableNotification(rtiNOTIFICATION_COMPARE0);
-        rtiStartCounter(rtiCOUNTER_BLOCK0);
-        while (RTI_TIMEOUT == 0)
-            ;
-        RTI_TIMEOUT = 0;
-        rtiDisableNotification(rtiNOTIFICATION_COMPARE0);
-        rtiStopCounter(rtiCOUNTER_BLOCK0);
-        rtiResetCounter(rtiCOUNTER_BLOCK0);
-    }
-}
+// void delayms(uint16_t ms) // Make new version of this
+// {
+//     if (ms == 0)
+//         return;
+//     else
+//     {
+//         rtiREG1->CMP[0U].COMPx = 10000 * ms;
+//         rtiREG1->CMP[0U].UDCPx = 10000 * ms;
+//         rtiEnableNotification(rtiNOTIFICATION_COMPARE0);
+//         rtiStartCounter(rtiCOUNTER_BLOCK0);
+//         while (RTI_TIMEOUT == 0)
+//             ;
+//         RTI_TIMEOUT = 0;
+//         rtiDisableNotification(rtiNOTIFICATION_COMPARE0);
+//         rtiStopCounter(rtiCOUNTER_BLOCK0);
+//         rtiResetCounter(rtiCOUNTER_BLOCK0);
+//     }
+// }
 
 uint16_t volt2Byte(float volt) // FROM SL: Take out? May be uneccesary
 {
