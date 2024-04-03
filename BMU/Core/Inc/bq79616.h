@@ -46,9 +46,9 @@
 // FUNCTION PROTOTYPES
 void SpiAutoAddress();
 
-int SpiWriteReg(BYTE bID, uint16_t wAddr, uint64 dwData, BYTE bLen, BYTE bWriteType);
-int SpiWriteFrame(uint16_t bID, uint16_t wAddr, uint16_t *pData, uint16_t bLen, uint8 bWriteType);
-int SpiReadReg(BYTE bID, uint16_t wAddr, uint16_t *pData, BYTE bLen, uint32 dwTimeOut, BYTE bWriteType);
+int SpiWriteReg(BYTE bID, uint16_t wAddr, uint64_t dwData, BYTE bLen, BYTE bWriteType);
+int SpiWriteFrame(uint16_t bID, uint16_t wAddr, uint16_t *pData, uint16_t bLen, uint8_t bWriteType);
+int SpiReadReg(BYTE bID, uint16_t wAddr, uint16_t *pData, BYTE bLen, uint32_t dwTimeOut, BYTE bWriteType);
 
 uint32 SpiCRC16(uint16_t *pBuf, int nLen);
 

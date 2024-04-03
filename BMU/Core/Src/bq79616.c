@@ -15,7 +15,9 @@
 
 /* From SL
     TODO:
-    - Redo spireadreg and spiwriteframe to have STM HAL functions
+    - Possibly move over everything to main.c???
+    - Redo spireadreg to have STM HAL functions
+    - Redo spiwriteframe to have STM HAL functions (How do you access things from spi handler from main?)
     - Redo autoaddress function to have STM HAL functions and fit the amount of boards we have
     - Replace all instances of delayms with STM HAL versions
     - Make new version of delayus
