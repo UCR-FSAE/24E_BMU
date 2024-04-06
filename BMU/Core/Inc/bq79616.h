@@ -27,7 +27,7 @@
 // ***based on your device silicon revision:       ***
 //****************************************************
 // #include "A0_reg.h"
-// #include "B0_reg.h"
+#include "B0_reg.h"
 
 // USER DEFINES
 #define TOTALBOARDS 2     // boards in stack, including base device

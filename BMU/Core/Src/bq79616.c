@@ -16,14 +16,14 @@
 /* From SL
     TODO:
     - DONE? Redo spiwritereg to have STM HAL functions
-    - DPME? Redo spireadreg to have STM HAL functions
+    - DONE? Redo spireadreg to have STM HAL functions
     - DONE? Redo spiwriteframe to have STM HAL functions (How do you access things from spi handler from main?)
-    - Redo autoaddress function to have STM HAL functions and fit the amount of boards we have
+    - DONE? Redo autoaddress function to have STM HAL functions and fit the amount of boards we have
     - DONE Replace all instances of delayms with STM HAL versions
     - DONE Make new version of delayus
     - DONE Change all uints to match STM versions
     - DONE Replace all instances of gioGetBit with STM HAL versions/figure out how pin works with BQ79600 datasheet
-    - Get rid of uneccesary functions, variables and includes from TI microcontroller
+    - DONE Get rid of uneccesary functions, variables and includes from TI microcontroller
     - Remake "PINGS" functions
     - DONE Add GPIO for SPI_RDY
 */
@@ -140,7 +140,7 @@ void SpiAutoAddress()
     SpiWriteReg(0, OTP_ECC_DATAIN4, 0X00, 1, FRMWRT_STK_W); // Don't know what to replace "OTP_ECC_DATAINX" with
     SpiWriteReg(0, OTP_ECC_DATAIN5, 0X00, 1, FRMWRT_STK_W);
     SpiWriteReg(0, OTP_ECC_DATAIN6, 0X00, 1, FRMWRT_STK_W);
-    SpiWriteReg(0, OTP_ECC_DATAIN7, 0X00, 1, FRMWRT_STK_W);
+    SpiWriteReg(0, OTP_ECC_DATAIN7, 0X00, 1, FRMWRT_STK_W); // Only 6 chips, maybe dont need this line
     SpiWriteReg(0, OTP_ECC_DATAIN8, 0X00, 1, FRMWRT_STK_W);
 
     // ENABLE AUTO ADDRESSING MODE
