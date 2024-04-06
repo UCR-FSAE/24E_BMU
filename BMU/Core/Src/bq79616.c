@@ -22,10 +22,10 @@
     - DONE Replace all instances of delayms with STM HAL versions
     - Make new version of delayus
     - DONE Change all uints to match STM versions
-    - Replace all instances of gioGetBit with STM HAL versions/figure out how pin works with BQ79600 datasheet
+    - DONE Replace all instances of gioGetBit with STM HAL versions/figure out how pin works with BQ79600 datasheet
     - Get rid of uneccesary functions, variables and includes from TI microcontroller
     - Remake "PINGS" functions
-    - Add GPIO for SPI_RDY
+    - DONE Add GPIO for SPI_RDY
 */
 
 #include <bq79616.h>
@@ -447,13 +447,13 @@ float Complement(uint16_t rawData, float multiplier)
     return -1 * (~rawData + 1) * multiplier;
 }
 
-BOOL GetFaultStat()
-{
+// BOOL GetFaultStat()
+// {
 
-    if (!gioGetBit(gioPORTA, 0))
-        return 0;
-    return 1;
-}
+//     if (!gioGetBit(gioPORTA, 0))
+//         return 0;
+//     return 1;
+// }
 
 void delayus(uint16_t us) // Make new version of this, may need to redo ioc file
 {
