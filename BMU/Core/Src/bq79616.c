@@ -15,12 +15,12 @@
 
 /* From SL
     TODO:
-    - Redo spiwritereg to have STM HAL functions
+    - DONE?Redo spiwritereg to have STM HAL functions
     - Redo spireadreg to have STM HAL functions
     - DONE? Redo spiwriteframe to have STM HAL functions (How do you access things from spi handler from main?)
     - Redo autoaddress function to have STM HAL functions and fit the amount of boards we have
     - DONE Replace all instances of delayms with STM HAL versions
-    - Make new version of delayus
+    - DONE Make new version of delayus
     - DONE Change all uints to match STM versions
     - DONE Replace all instances of gioGetBit with STM HAL versions/figure out how pin works with BQ79600 datasheet
     - Get rid of uneccesary functions, variables and includes from TI microcontroller
@@ -455,43 +455,50 @@ float Complement(uint16_t rawData, float multiplier)
 //     return 1;
 // }
 
-void delayus(uint16_t us) // Make new version of this, may need to redo ioc file
+void delayus(uint16_t us) // FROM SL: New version of delayus
 {
-    if (us == 0)
-        return;
-    else
-    {
-        // CHANGE THE INTERRUPT COMPARE VALUES (PERIOD OF INTERRUPT)
-        // Setup compare 0 value.
-        rtiREG1->CMP[0U].COMPx = 10 * us; // 10 ticks of clock per microsecond, so multiply by 10
-        // Setup update compare 0 value.
-        rtiREG1->CMP[0U].UDCPx = 10 * us;
-
-        // ENABLE THE NOTIFICATION FOR THE PERIOD WE SET
-        rtiEnableNotification(rtiNOTIFICATION_COMPARE0);
-
-        // START THE COUNTER
-        rtiStartCounter(rtiCOUNTER_BLOCK0);
-
-        // WAIT IN LOOP UNTIL THE INTERRUPT HAPPENS (HAPPENS AFTER THE PERIOD WE SET)
-        // WHEN INTERRUPT HAPPENS, RTI_NOTIFICATION GETS SET TO 1 IN THAT INTERRUPT
-        // GO TO notification.c -> rtiNotification() to see where RTI_TIMEOUT is set to 1
-        while (RTI_TIMEOUT == 0)
-            ;
-
-        // RESET THE VARIABLE TO 0, FOR THE NEXT TIME WE DO A DELAY
-        RTI_TIMEOUT = 0;
-
-        // DISABLE THE INTERRUPT NOTIFICATION
-        rtiDisableNotification(rtiNOTIFICATION_COMPARE0);
-
-        // STOP THE COUNTER
-        rtiStopCounter(rtiCOUNTER_BLOCK0);
-
-        // RESET COUNTER FOR THE NEXT TIME WE DO A DELAY
-        rtiResetCounter(rtiCOUNTER_BLOCK0);
-    }
+    __HAL_TIM_SET_COUNTER(&htim1, 0); // set the counter value a 0
+    while (__HAL_TIM_GET_COUNTER(&htim1) < us)
+        ; // wait for the counter to reach the us input in the parameter
 }
+
+// void delayus(uint16_t us) // Make new version of this, may need to redo ioc file
+// {
+//     if (us == 0)
+//         return;
+//     else
+//     {
+//         // CHANGE THE INTERRUPT COMPARE VALUES (PERIOD OF INTERRUPT)
+//         // Setup compare 0 value.
+//         rtiREG1->CMP[0U].COMPx = 10 * us; // 10 ticks of clock per microsecond, so multiply by 10
+//         // Setup update compare 0 value.
+//         rtiREG1->CMP[0U].UDCPx = 10 * us;
+
+//         // ENABLE THE NOTIFICATION FOR THE PERIOD WE SET
+//         rtiEnableNotification(rtiNOTIFICATION_COMPARE0);
+
+//         // START THE COUNTER
+//         rtiStartCounter(rtiCOUNTER_BLOCK0);
+
+//         // WAIT IN LOOP UNTIL THE INTERRUPT HAPPENS (HAPPENS AFTER THE PERIOD WE SET)
+//         // WHEN INTERRUPT HAPPENS, RTI_NOTIFICATION GETS SET TO 1 IN THAT INTERRUPT
+//         // GO TO notification.c -> rtiNotification() to see where RTI_TIMEOUT is set to 1
+//         while (RTI_TIMEOUT == 0)
+//             ;
+
+//         // RESET THE VARIABLE TO 0, FOR THE NEXT TIME WE DO A DELAY
+//         RTI_TIMEOUT = 0;
+
+//         // DISABLE THE INTERRUPT NOTIFICATION
+//         rtiDisableNotification(rtiNOTIFICATION_COMPARE0);
+
+//         // STOP THE COUNTER
+//         rtiStopCounter(rtiCOUNTER_BLOCK0);
+
+//         // RESET COUNTER FOR THE NEXT TIME WE DO A DELAY
+//         rtiResetCounter(rtiCOUNTER_BLOCK0);
+//     }
+// }
 
 // void delayms(uint16_t ms) // Make new version of this
 // {
