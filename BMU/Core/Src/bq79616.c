@@ -15,8 +15,8 @@
 
 /* From SL
     TODO:
-    - DONE?Redo spiwritereg to have STM HAL functions
-    - Redo spireadreg to have STM HAL functions
+    - DONE? Redo spiwritereg to have STM HAL functions
+    - DPME? Redo spireadreg to have STM HAL functions
     - DONE? Redo spiwriteframe to have STM HAL functions (How do you access things from spi handler from main?)
     - Redo autoaddress function to have STM HAL functions and fit the amount of boards we have
     - DONE Replace all instances of delayms with STM HAL versions
@@ -343,15 +343,18 @@ int SpiReadReg(BYTE bID, uint16_t wAddr, uint16_t *pData, BYTE bLen, uint32_t dw
         {
             if (bWriteType == FRMWRT_SGL_R)
             {
-                spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, 128, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
+                // spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, 128, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
+                HAL_SPI_TransmitReceive(&hspi3, FFBuffer, movingPointer, 128, HAL_MAX_DELAY);
             }
             else if (bWriteType == FRMWRT_STK_R)
             {
-                spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, 128, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
+                // spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, 128, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
+                HAL_SPI_TransmitReceive(&hspi3, FFBuffer, movingPointer, 128, HAL_MAX_DELAY);
             }
             else if (bWriteType == FRMWRT_ALL_R)
             {
-                spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, 128, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
+                // spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, 128, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
+                HAL_SPI_TransmitReceive(&hspi3, FFBuffer, movingPointer, 128, HAL_MAX_DELAY);
             }
             movingPointer += 128;
         }
@@ -361,17 +364,20 @@ int SpiReadReg(BYTE bID, uint16_t wAddr, uint16_t *pData, BYTE bLen, uint32_t dw
         {
             if (bWriteType == FRMWRT_SGL_R)
             {
-                spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, K, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
+                // spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, K, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
+                HAL_SPI_TransmitReceive(&hspi3, FFBuffer, movingPointer, K, HAL_MAX_DELAY);
                 bRes = bLen + 6;
             }
             else if (bWriteType == FRMWRT_STK_R)
             {
-                spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, K, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
+                // spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, K, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
+                HAL_SPI_TransmitReceive(&hspi3, FFBuffer, movingPointer, K, HAL_MAX_DELAY);
                 bRes = (bLen + 6) * (TOTALBOARDS - 1);
             }
             else if (bWriteType == FRMWRT_ALL_R)
             {
-                spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, K, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
+                // spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, K, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
+                HAL_SPI_TransmitReceive(&hspi3, FFBuffer, movingPointer, K, HAL_MAX_DELAY);
                 bRes = (bLen + 6) * TOTALBOARDS;
             }
         }
