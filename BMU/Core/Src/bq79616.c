@@ -25,6 +25,7 @@
     - Replace all instances of gioGetBit with STM HAL versions/figure out how pin works with BQ79600 datasheet
     - Get rid of uneccesary functions, variables and includes from TI microcontroller
     - Remake "PINGS" functions
+    - Add GPIO for SPI_RDY
 */
 
 #include <bq79616.h>
@@ -191,7 +192,7 @@ int SpiWriteReg(BYTE bID, uint16_t wAddr, uint64_t dwData, BYTE bLen, BYTE bWrit
     // device address, register start address, data bytes, data length, write type (single, broadcast, stack)
     bRes = 0;
     memset(spiBuf, 0, sizeof(spiBuf));
-    while (gioGetBit(gioPORTA, 1) == 0) // FROM SL: What is this pin suppose to be?
+    while (gioGetBit(gioPORTA, 1) == 0) // FROM SL: What is this pin suppose to be? IT IS SPI_RDY, make new pin in IOC for it
         delayus(5);                     // wait until SPI_RDY is ready
     switch (bLen)
     {

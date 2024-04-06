@@ -65,6 +65,8 @@ void Error_Handler(void);
 #define MODULE__GPIO_Port GPIOA
 #define MODULE3_Pin GPIO_PIN_2
 #define MODULE3_GPIO_Port GPIOA
+#define SPI_RDY_Pin GPIO_PIN_1
+#define SPI_RDY_GPIO_Port GPIOG
 #define RMII_TXD1_Pin GPIO_PIN_13
 #define RMII_TXD1_GPIO_Port GPIOB
 #define USB_PowerSwitchOn_Pin GPIO_PIN_6
