@@ -19,6 +19,7 @@
 
 #include "datatypes.h"
 #include "main.h"
+#include <stdio.h>
 // #include "hal_stdtypes.h"
 // #include "spi.h"
 
