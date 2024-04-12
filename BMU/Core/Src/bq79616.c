@@ -24,7 +24,7 @@
     - DONE Change all uints to match STM versions
     - DONE Replace all instances of gioGetBit with STM HAL versions/figure out how pin works with BQ79600 datasheet
     - DONE Get rid of uneccesary functions, variables and includes from TI microcontroller
-    - Remake "PINGS" functions
+    - DONE "PINGS" functions
     - DONE Add GPIO for SPI_RDY
 */
 
@@ -85,39 +85,71 @@ int K = 0; // number of bytes remaining in the last group of 128
 
 void SpiWake79600(void)
 {
-    spiREG3->PC0 &= ~(uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // disable MOSI and nCS - now GPIO
-    gioToggleBit(spiPORT3, 1U);
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
+    HAL_Delay(2);                                         // Set nCS high at start
+    HAL_SPI_DeInit(&hspi3);                               // Deinitialize SPI
+    MosiGpioInit();                                       // Set MOSI pin to GPIO
+    GPIOC->BSRR |= (1 << 12);                             // Set the Pin PC12 to high
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET); // Set nCS low
     delayus(0.5);
-    gioSetBit(spiPORT3, 10U, 0);
-    delayus(2750); // WAKE ping = 2.5ms to 3ms
-    gioSetBit(spiPORT3, 10U, 1);
+    GPIOC->BSRR |= (1 << 28); // Set the Pin PC12 to low
+    delayus(2750);            // WAKE ping = 2.5ms to 3ms
+    GPIOC->BSRR |= (1 << 12); // Set the Pin PC12 to high
     delayus(0.5);
-    gioToggleBit(spiPORT3, 1U);
-    spiREG3->PC0 |= (uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // re-enable MOSI and nCS - now SPI
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
+    MX_SPI3_Init(); // Reinitialize SPI
 }
 void SpiSD79600(void)
 {
-    spiREG3->PC0 &= ~(uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // disable MOSI and nCS - now GPIO
-    gioToggleBit(spiPORT3, 1U);
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
+    HAL_Delay(2);                                         // Set nCS high at start
+    HAL_SPI_DeInit(&hspi3);                               // Deinitialize SPI
+    MosiGpioInit();                                       // Set MOSI pin to GPIO
+    GPIOC->BSRR |= (1 << 12);                             // Set the Pin PC12 to high
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET); // Set nCS low
     delayus(0.5);
-    gioSetBit(spiPORT3, 10U, 0);
-    HAL_Delay(13); // Shutdown ping = >12.5ms
-    gioSetBit(spiPORT3, 10U, 1);
+    GPIOC->BSRR |= (1 << 28); // Set the Pin PC12 to low
+    HAL_Delay(13);            // Shutdown ping = >12.5ms
+    GPIOC->BSRR |= (1 << 12); // Set the Pin PC12 to high
     delayus(0.5);
-    gioToggleBit(spiPORT3, 1U);
-    spiREG3->PC0 |= (uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // re-enable MOSI and nCS - now SPI
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
+    MX_SPI3_Init(); // Reinitialize SPI
+
+    // spiREG3->PC0 &= ~(uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // disable MOSI and nCS - now GPIO
+    // gioToggleBit(spiPORT3, 1U);
+    // delayus(0.5);
+    // gioSetBit(spiPORT3, 10U, 0);
+    // HAL_Delay(13); // Shutdown ping = >12.5ms
+    // gioSetBit(spiPORT3, 10U, 1);
+    // delayus(0.5);
+    // gioToggleBit(spiPORT3, 1U);
+    // spiREG3->PC0 |= (uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // re-enable MOSI and nCS - now SPI
 }
 void SpiStA79600(void)
 {
-    spiREG3->PC0 &= ~(uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // disable MOSI and nCS - now GPIO
-    gioToggleBit(spiPORT3, 1U);
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
+    HAL_Delay(2);                                         // Set nCS high at start
+    HAL_SPI_DeInit(&hspi3);                               // Deinitialize SPI
+    MosiGpioInit();                                       // Set MOSI pin to GPIO
+    GPIOC->BSRR |= (1 << 12);                             // Set the Pin PC12 to high
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET); // Set nCS low
     delayus(0.5);
-    gioSetBit(spiPORT3, 10U, 0);
-    delayus(275); // Sleep to Active ping = 250us to 300us
-    gioSetBit(spiPORT3, 10U, 1);
+    GPIOC->BSRR |= (1 << 28); // Set the Pin PC12 to low
+    delayus(275);             // Sleep to Active ping = 250us to 300us
+    GPIOC->BSRR |= (1 << 12); // Set the Pin PC12 to high
     delayus(0.5);
-    gioToggleBit(spiPORT3, 1U);
-    spiREG3->PC0 |= (uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // re-enable MOSI and nCS - now SPI
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
+    MX_SPI3_Init(); // Reinitialize SPI
+
+    // spiREG3->PC0 &= ~(uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // disable MOSI and nCS - now GPIO
+    // gioToggleBit(spiPORT3, 1U);
+    // delayus(0.5);
+    // gioSetBit(spiPORT3, 10U, 0);
+    // delayus(275); // Sleep to Active ping = 250us to 300us
+    // gioSetBit(spiPORT3, 10U, 1);
+    // delayus(0.5);
+    // gioToggleBit(spiPORT3, 1U);
+    // spiREG3->PC0 |= (uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // re-enable MOSI and nCS - now SPI
 }
 
 void SpiCommClear79600(void)
@@ -440,6 +472,20 @@ uint32_t SpiCRC16(uint16_t *pBuf, int nLen)
 //************************
 // MISCELLANEOUS FUNCTIONS
 //************************
+
+// Made by SL
+void MosiGpioInit()
+{
+    // Enable clock for GPIOG
+    RCC->AHB1ENR |= (1 << 2); // Enable the GPIOC clock
+
+    // Configure GPIO pin : PC12
+    GPIOC->MODER |= (1 << 24);                // pin PA5(bits 25:24) as Output (01)
+    GPIOC->OTYPER &= ~(1 << 12);              // bit 12=0 --> Output push pull
+    GPIOC->OSPEEDR |= (1 << 24);              // Pin PA5 (bits 25:24) as Fast Speed (1:0)
+    GPIOC->PUPDR &= ~((1 << 24) | (1 << 25)); // Pin PA5 (bits 25:24) are 0:0 --> no pull up or pulldown
+}
+
 void SpiDisableTimeout_600_616(void)
 {
     // Disable timeout 600
