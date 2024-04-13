@@ -18,8 +18,9 @@
 #define BQ79616_H_
 
 #include "datatypes.h"
-#include "main.h"
-#include <stdio.h>
+// #include "main.h"
+//#include <stdio.h>
+#include "stm32f7xx_hal.h"
 // #include "hal_stdtypes.h"
 // #include "spi.h"
 
@@ -52,7 +53,7 @@ int SpiWriteReg(BYTE bID, uint16_t wAddr, uint64_t dwData, BYTE bLen, BYTE bWrit
 int SpiWriteFrame(uint16_t bID, uint16_t wAddr, uint16_t *pData, uint16_t bLen, uint8_t bWriteType);
 int SpiReadReg(BYTE bID, uint16_t wAddr, uint16_t *pData, BYTE bLen, uint32_t dwTimeOut, BYTE bWriteType);
 
-uint32 SpiCRC16(uint16_t *pBuf, int nLen);
+uint32_t SpiCRC16(uint16_t *pBuf, int nLen);
 
 void delayus(uint16_t us);
 void delayms(uint16_t ms);
@@ -63,11 +64,11 @@ float Complement(uint16_t rawData, float multiplier);
 BOOL GetFaultStat();
 uint16_t volt2Byte(float volt);
 
-unsigned printConsole(const char *_format, ...);
+//unsigned printConsole(const char *_format, ...);
 
 // SPI variables
-spiDAT1_t dataconfig1_t; // FROM SL: Take out?
-uint16_t FFBuffer[128];
+// spiDAT1_t dataconfig1_t; // FROM SL: Take out?
+extern uint16_t FFBuffer[128];
 
-#endif /* BQ79606_H_ */
+#endif /* BQ79616_H_ */
 // EOF

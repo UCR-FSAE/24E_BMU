@@ -36,7 +36,7 @@
 // #include "rti.h" // FROM SL: TI function used in delay functions, may take out
 // #include "gio.h" // FROM SL: TI functions used in wake functions, may take out
 #include "datatypes.h"
-#include "stdarg.h"
+//#include "stdarg.h"
 #include "main.h"
 
 // GLOBAL VARIABLES (use these to avoid stack overflows by creating too many function variables)
@@ -76,6 +76,13 @@ uint16_t spiReturn = 0;
 int M = 0; // expected total response bytes
 int i = 0; // number of groups of 128 bytes
 int K = 0; // number of bytes remaining in the last group of 128
+
+static void MosiGpioInit(void);
+extern SPI_HandleTypeDef hspi3;
+extern TIM_HandleTypeDef htim1;
+// SPI variables
+// spiDAT1_t dataconfig1_t; // FROM SL: Take out?
+uint16_t FFBuffer[128];
 
 //******
 // PINGS
@@ -152,10 +159,10 @@ void SpiStA79600(void)
     // spiREG3->PC0 |= (uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // re-enable MOSI and nCS - now SPI
 }
 
-void SpiCommClear79600(void)
-{
-    spiTransmitData(spiREG3, &dataconfig1_t, 1, 0x00);
-}
+//void SpiCommClear79600(void)
+//{
+//    spiTransmitData(spiREG3, &dataconfig1_t, 1, 0x00);
+//}
 //**********
 // END PINGS
 //**********
@@ -576,29 +583,29 @@ uint16_t volt2Byte(float volt) // FROM SL: Take out? May be uneccesary
     return (uint16_t) ~((int16_t)((-volt / 0.00019073) - 1.0));
 }
 
-unsigned printConsole(const char *_format, ...) // FROM SL: Take out? May be uneccesary
-{
-    char str[128];
-    int length = -1, k = 0;
-
-    va_list argList;
-    va_start(argList, _format);
-
-    length = vsnprintf(str, sizeof(str), _format, argList);
-
-    va_end(argList);
-
-    //   if (length > 0)
-    //   {
-    //      for(k=0; k<length; k++)
-    //      {
-    //          HetUART1PutChar(str[k]);
-    //      }
-    //   }
-    sciSend(scilinREG, length, str);
-
-    return (unsigned)length;
-}
+//unsigned printConsole(const char *_format, ...) // FROM SL: Take out? May be uneccesary
+//{
+//    char str[128];
+//    int length = -1, k = 0;
+//
+//    va_list argList;
+//    va_start(argList, _format);
+//
+//    length = vsnprintf(str, sizeof(str), _format, argList);
+//
+//    va_end(argList);
+//
+//    //   if (length > 0)
+//    //   {
+//    //      for(k=0; k<length; k++)
+//    //      {
+//    //          HetUART1PutChar(str[k]);
+//    //      }
+//    //   }
+//    sciSend(scilinREG, length, str);
+//
+//    return (unsigned)length;
+//}
 
 //***************************
 // END MISCELLANEOUS FUNCTIONS
