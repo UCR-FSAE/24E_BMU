@@ -13,30 +13,17 @@
  **
  ******************************************************************************/
 
-/* From SL
-    TODO:
-    - DONE? Redo spiwritereg to have STM HAL functions
-    - DONE? Redo spireadreg to have STM HAL functions
-    - DONE? Redo spiwriteframe to have STM HAL functions (How do you access things from spi handler from main?)
-    - DONE? Redo autoaddress function to have STM HAL functions and fit the amount of boards we have
-    - DONE Replace all instances of delayms with STM HAL versions
-    - DONE Make new version of delayus
-    - DONE Change all uints to match STM versions
-    - DONE Replace all instances of gioGetBit with STM HAL versions/figure out how pin works with BQ79600 datasheet
-    - DONE Get rid of uneccesary functions, variables and includes from TI microcontroller
-    - DONE "PINGS" functions
-    - DONE Add GPIO for SPI_RDY
-*/
+/*
+ *  @Edited for FSAE Highlander Racing Team
+ *
+ *  @Workers: Steven Ryan Leonido
+ *  @date April 2024
+ */
 
 #include <bq79616.h>
 #include <bq79600.h>
 #include "string.h"
-// #include "sci.h" // FROM SL: TI functions used in printConsole function, may take out
-// #include "spi.h" // FROM SL: TI functions used in SPI functions, may take out
-// #include "rti.h" // FROM SL: TI function used in delay functions, may take out
-// #include "gio.h" // FROM SL: TI functions used in wake functions, may take out
 #include "datatypes.h"
-//#include "stdarg.h"
 #include "main.h"
 
 // GLOBAL VARIABLES (use these to avoid stack overflows by creating too many function variables)
@@ -81,14 +68,11 @@ static void MosiGpioInit(void);
 extern SPI_HandleTypeDef hspi3;
 extern TIM_HandleTypeDef htim1;
 // SPI variables
-// spiDAT1_t dataconfig1_t; // FROM SL: Take out?
 uint16_t FFBuffer[128];
 
 //******
 // PINGS
 //******
-
-// FROM SL: REDO OR Make alternative of these
 
 void SpiWake79600(void)
 {
@@ -121,16 +105,6 @@ void SpiSD79600(void)
     delayus(0.5);
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
     MX_SPI3_Init(); // Reinitialize SPI
-
-    // spiREG3->PC0 &= ~(uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // disable MOSI and nCS - now GPIO
-    // gioToggleBit(spiPORT3, 1U);
-    // delayus(0.5);
-    // gioSetBit(spiPORT3, 10U, 0);
-    // HAL_Delay(13); // Shutdown ping = >12.5ms
-    // gioSetBit(spiPORT3, 10U, 1);
-    // delayus(0.5);
-    // gioToggleBit(spiPORT3, 1U);
-    // spiREG3->PC0 |= (uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // re-enable MOSI and nCS - now SPI
 }
 void SpiStA79600(void)
 {
@@ -147,24 +121,14 @@ void SpiStA79600(void)
     delayus(0.5);
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
     MX_SPI3_Init(); // Reinitialize SPI
-
-    // spiREG3->PC0 &= ~(uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // disable MOSI and nCS - now GPIO
-    // gioToggleBit(spiPORT3, 1U);
-    // delayus(0.5);
-    // gioSetBit(spiPORT3, 10U, 0);
-    // delayus(275); // Sleep to Active ping = 250us to 300us
-    // gioSetBit(spiPORT3, 10U, 1);
-    // delayus(0.5);
-    // gioToggleBit(spiPORT3, 1U);
-    // spiREG3->PC0 |= (uint32_t)((uint32_t)(1U << 10U | 1U << 1U)); // re-enable MOSI and nCS - now SPI
 }
 
-//void SpiCommClear79600(void)
+// void SpiCommClear79600(void)
 //{
-//    spiTransmitData(spiREG3, &dataconfig1_t, 1, 0x00);
-//}
+//     spiTransmitData(spiREG3, &dataconfig1_t, 1, 0x00);
+// }
 //**********
-// END PINGS
+//  END PINGS
 //**********
 
 //**********************
@@ -583,29 +547,29 @@ uint16_t volt2Byte(float volt) // FROM SL: Take out? May be uneccesary
     return (uint16_t) ~((int16_t)((-volt / 0.00019073) - 1.0));
 }
 
-//unsigned printConsole(const char *_format, ...) // FROM SL: Take out? May be uneccesary
+// unsigned printConsole(const char *_format, ...) // FROM SL: Take out? May be uneccesary
 //{
-//    char str[128];
-//    int length = -1, k = 0;
+//     char str[128];
+//     int length = -1, k = 0;
 //
-//    va_list argList;
-//    va_start(argList, _format);
+//     va_list argList;
+//     va_start(argList, _format);
 //
-//    length = vsnprintf(str, sizeof(str), _format, argList);
+//     length = vsnprintf(str, sizeof(str), _format, argList);
 //
-//    va_end(argList);
+//     va_end(argList);
 //
-//    //   if (length > 0)
-//    //   {
-//    //      for(k=0; k<length; k++)
-//    //      {
-//    //          HetUART1PutChar(str[k]);
-//    //      }
-//    //   }
-//    sciSend(scilinREG, length, str);
+//     //   if (length > 0)
+//     //   {
+//     //      for(k=0; k<length; k++)
+//     //      {
+//     //          HetUART1PutChar(str[k]);
+//     //      }
+//     //   }
+//     sciSend(scilinREG, length, str);
 //
-//    return (unsigned)length;
-//}
+//     return (unsigned)length;
+// }
 
 //***************************
 // END MISCELLANEOUS FUNCTIONS
