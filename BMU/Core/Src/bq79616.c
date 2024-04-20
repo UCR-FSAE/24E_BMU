@@ -74,6 +74,11 @@ uint16_t FFBuffer[128];
 // PINGS
 //******
 
+/**
+ * @brief  Wake up the bq79600 with ping. Set SPI to GPIO, set MOSI to low for 2.5 to 3ms, reinitialize SPI.
+ * @param  None
+ * @retval None
+ */
 void SpiWake79600(void)
 {
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
@@ -90,6 +95,12 @@ void SpiWake79600(void)
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
     MX_SPI3_Init(); // Reinitialize SPI
 }
+
+/**
+ * @brief  Shutdown the bq79600 with ping. Set SPI to GPIO, set MOSI to low for 13 ms, reinitialize SPI.
+ * @param  None
+ * @retval None
+ */
 void SpiSD79600(void)
 {
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
@@ -106,6 +117,12 @@ void SpiSD79600(void)
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
     MX_SPI3_Init(); // Reinitialize SPI
 }
+
+/**
+ * @brief  Sleep to Active bq79600 ping. Set SPI to GPIO, set MOSI to low for 13 ms, reinitialize SPI.
+ * @param  None
+ * @retval None
+ */
 void SpiStA79600(void)
 {
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
@@ -123,6 +140,11 @@ void SpiStA79600(void)
     MX_SPI3_Init(); // Reinitialize SPI
 }
 
+/**
+ * @brief  Clear the SPI communication line by sending 0x00.
+ * @param  None
+ * @retval None
+ */
 void SpiCommClear79600(void)
 {
     HAL_SPI_Transmit(&hspi3, 0x00, 1, HAL_MAX_DELAY);
@@ -134,6 +156,12 @@ void SpiCommClear79600(void)
 //**********************
 // AUTO ADDRESS SEQUENCE
 //**********************
+
+/**
+ * @brief  Auto address the bq79600s. Set all devices to stack mode, set the highest device as top of stack, synchronize the DLL.
+ * @param  None
+ * @retval None
+ */
 void SpiAutoAddress()
 {
     // DUMMY WRITE TO SNCHRONIZE ALL DAISY CHAIN DEVICES DLL (IF A DEVICE RESET OCCURED PRIOR TO THIS)
@@ -190,6 +218,16 @@ void SpiAutoAddress()
 //************************
 // WRITE AND READ FUNCTIONS
 //************************
+
+/**
+ * @brief  Write a message to the bq79600. Send the device address, register address, data, data length, and write type.
+ * @param  bID device addresss
+ * @param  wAddr register address
+ * @param  dwData data to be written
+ * @param  bLen length of data
+ * @param  bWriteType write type (single, broadcast, stack)
+ * @retval bytes received
+ */
 int SpiWriteReg(BYTE bID, uint16_t wAddr, uint64_t dwData, BYTE bLen, BYTE bWriteType)
 {
     // device address, register start address, data bytes, data length, write type (single, broadcast, stack)
