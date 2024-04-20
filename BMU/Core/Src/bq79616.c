@@ -288,7 +288,6 @@ int SpiWriteFrame(uint16_t bID, uint16_t wAddr, uint16_t *pData, uint16_t bLen, 
     *spiPBuf++ = (spiWCRC & 0xFF00) >> 8;
     spiPktLen += 2;
 
-    // spiTransmitData(spiREG3, &dataconfig1_t, spiPktLen, spiFrame); // Replace all instances of this with STM HAL ver
     HAL_SPI_Transmit(&hspi3, spiFrame, spiPktLen, HAL_MAX_DELAY); // FROM SL: Is spiPktLen in correct units??? Number of bytes?
 
     return spiPktLen;
@@ -346,17 +345,14 @@ int SpiReadReg(BYTE bID, uint16_t wAddr, uint16_t *pData, BYTE bLen, uint32_t dw
         {
             if (bWriteType == FRMWRT_SGL_R)
             {
-                // spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, 128, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
                 HAL_SPI_TransmitReceive(&hspi3, FFBuffer, movingPointer, 128, HAL_MAX_DELAY);
             }
             else if (bWriteType == FRMWRT_STK_R)
             {
-                // spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, 128, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
                 HAL_SPI_TransmitReceive(&hspi3, FFBuffer, movingPointer, 128, HAL_MAX_DELAY);
             }
             else if (bWriteType == FRMWRT_ALL_R)
             {
-                // spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, 128, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
                 HAL_SPI_TransmitReceive(&hspi3, FFBuffer, movingPointer, 128, HAL_MAX_DELAY);
             }
             movingPointer += 128;
@@ -367,19 +363,16 @@ int SpiReadReg(BYTE bID, uint16_t wAddr, uint16_t *pData, BYTE bLen, uint32_t dw
         {
             if (bWriteType == FRMWRT_SGL_R)
             {
-                // spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, K, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
                 HAL_SPI_TransmitReceive(&hspi3, FFBuffer, movingPointer, K, HAL_MAX_DELAY);
                 bRes = bLen + 6;
             }
             else if (bWriteType == FRMWRT_STK_R)
             {
-                // spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, K, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
                 HAL_SPI_TransmitReceive(&hspi3, FFBuffer, movingPointer, K, HAL_MAX_DELAY);
                 bRes = (bLen + 6) * (TOTALBOARDS - 1);
             }
             else if (bWriteType == FRMWRT_ALL_R)
             {
-                // spiTransmitAndReceiveData(spiREG3, &dataconfig1_t, K, FFBuffer, movingPointer); // Replace all instances of this with STM HAL ver
                 HAL_SPI_TransmitReceive(&hspi3, FFBuffer, movingPointer, K, HAL_MAX_DELAY);
                 bRes = (bLen + 6) * TOTALBOARDS;
             }
@@ -485,91 +478,10 @@ void delayus(uint16_t us) // FROM SL: New version of delayus
         ; // wait for the counter to reach the us input in the parameter
 }
 
-// void delayus(uint16_t us) // Make new version of this, may need to redo ioc file
-// {
-//     if (us == 0)
-//         return;
-//     else
-//     {
-//         // CHANGE THE INTERRUPT COMPARE VALUES (PERIOD OF INTERRUPT)
-//         // Setup compare 0 value.
-//         rtiREG1->CMP[0U].COMPx = 10 * us; // 10 ticks of clock per microsecond, so multiply by 10
-//         // Setup update compare 0 value.
-//         rtiREG1->CMP[0U].UDCPx = 10 * us;
-
-//         // ENABLE THE NOTIFICATION FOR THE PERIOD WE SET
-//         rtiEnableNotification(rtiNOTIFICATION_COMPARE0);
-
-//         // START THE COUNTER
-//         rtiStartCounter(rtiCOUNTER_BLOCK0);
-
-//         // WAIT IN LOOP UNTIL THE INTERRUPT HAPPENS (HAPPENS AFTER THE PERIOD WE SET)
-//         // WHEN INTERRUPT HAPPENS, RTI_NOTIFICATION GETS SET TO 1 IN THAT INTERRUPT
-//         // GO TO notification.c -> rtiNotification() to see where RTI_TIMEOUT is set to 1
-//         while (RTI_TIMEOUT == 0)
-//             ;
-
-//         // RESET THE VARIABLE TO 0, FOR THE NEXT TIME WE DO A DELAY
-//         RTI_TIMEOUT = 0;
-
-//         // DISABLE THE INTERRUPT NOTIFICATION
-//         rtiDisableNotification(rtiNOTIFICATION_COMPARE0);
-
-//         // STOP THE COUNTER
-//         rtiStopCounter(rtiCOUNTER_BLOCK0);
-
-//         // RESET COUNTER FOR THE NEXT TIME WE DO A DELAY
-//         rtiResetCounter(rtiCOUNTER_BLOCK0);
-//     }
-// }
-
-// void delayms(uint16_t ms) // Make new version of this
-// {
-//     if (ms == 0)
-//         return;
-//     else
-//     {
-//         rtiREG1->CMP[0U].COMPx = 10000 * ms;
-//         rtiREG1->CMP[0U].UDCPx = 10000 * ms;
-//         rtiEnableNotification(rtiNOTIFICATION_COMPARE0);
-//         rtiStartCounter(rtiCOUNTER_BLOCK0);
-//         while (RTI_TIMEOUT == 0)
-//             ;
-//         RTI_TIMEOUT = 0;
-//         rtiDisableNotification(rtiNOTIFICATION_COMPARE0);
-//         rtiStopCounter(rtiCOUNTER_BLOCK0);
-//         rtiResetCounter(rtiCOUNTER_BLOCK0);
-//     }
-// }
-
 uint16_t volt2Byte(float volt) // FROM SL: Take out? May be uneccesary
 {
     return (uint16_t) ~((int16_t)((-volt / 0.00019073) - 1.0));
 }
-
-// unsigned printConsole(const char *_format, ...) // FROM SL: Take out? May be uneccesary
-//{
-//     char str[128];
-//     int length = -1, k = 0;
-//
-//     va_list argList;
-//     va_start(argList, _format);
-//
-//     length = vsnprintf(str, sizeof(str), _format, argList);
-//
-//     va_end(argList);
-//
-//     //   if (length > 0)
-//     //   {
-//     //      for(k=0; k<length; k++)
-//     //      {
-//     //          HetUART1PutChar(str[k]);
-//     //      }
-//     //   }
-//     sciSend(scilinREG, length, str);
-//
-//     return (unsigned)length;
-// }
 
 //***************************
 // END MISCELLANEOUS FUNCTIONS
