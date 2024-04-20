@@ -123,10 +123,10 @@ void SpiStA79600(void)
     MX_SPI3_Init(); // Reinitialize SPI
 }
 
-// void SpiCommClear79600(void)
-//{
-//     spiTransmitData(spiREG3, &dataconfig1_t, 1, 0x00);
-// }
+void SpiCommClear79600(void)
+{
+    HAL_SPI_Transmit(&hspi3, 0x00, 1, HAL_MAX_DELAY);
+}
 //**********
 //  END PINGS
 //**********
