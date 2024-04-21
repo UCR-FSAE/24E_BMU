@@ -18,11 +18,7 @@
 #define BQ79616_H_
 
 #include "datatypes.h"
-// #include "main.h"
-//#include <stdio.h>
 #include "stm32f7xx_hal.h"
-// #include "hal_stdtypes.h"
-// #include "spi.h"
 
 //****************************************************
 // ***Register defines, choose one of the following***
@@ -61,13 +57,10 @@ void delayms(uint16_t ms);
 void SpiDisableTimeout_600_616(void);
 
 float Complement(uint16_t rawData, float multiplier);
-BOOL GetFaultStat();
+// BOOL GetFaultStat();
 uint16_t volt2Byte(float volt);
 
-//unsigned printConsole(const char *_format, ...);
-
 // SPI variables
-// spiDAT1_t dataconfig1_t; // FROM SL: Take out?
 extern uint16_t FFBuffer[128];
 
 #endif /* BQ79616_H_ */

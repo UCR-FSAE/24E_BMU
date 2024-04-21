@@ -18,7 +18,6 @@
 #define BQ79600_H_
 
 #include "datatypes.h"
-// #include "hal_stdtypes.h"
 
 // BQ79600-Q1 REGISTER DEFINES
 #define Bridge_DIAG_CTRL 0x2000
