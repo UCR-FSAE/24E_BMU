@@ -14,9 +14,9 @@
  ******************************************************************************/
 
 /*
- *  @Edited for FSAE Highlander Racing Team
+ *  @note for FSAE Highlander Racing Team
  *
- *  @Workers: Steven Ryan Leonido
+ *  @author Steven Ryan Leonido
  *  @date April 2024
  */
 
@@ -303,6 +303,15 @@ int SpiWriteReg(BYTE bID, uint16_t wAddr, uint64_t dwData, BYTE bLen, BYTE bWrit
     return bRes;
 }
 
+/**
+ * @brief  Helper function to write full frame for SpiReadReg. Uses HAL SPI to transmit the frame.
+ * @param  bID device addresss
+ * @param  wAddr register address
+ * @param  pData data to be written
+ * @param  bLen length of data
+ * @param  bWriteType write type (single, broadcast, stack)
+ * @retval bytes received
+ */
 int SpiWriteFrame(uint16_t bID, uint16_t wAddr, uint16_t *pData, uint16_t bLen, uint8_t bWriteType)
 {
     spiPktLen = 0;
@@ -332,6 +341,18 @@ int SpiWriteFrame(uint16_t bID, uint16_t wAddr, uint16_t *pData, uint16_t bLen, 
 }
 
 // GENERATE READ COMMAND FRAME AND THEN WAIT FOR RESPONSE DATA (INTERRUPT MODE FOR SCIRX)
+
+/**
+ * @brief  Write a read message to bq79600 and wait for data. Send device address,
+ *         register start address, byte frame pointer to start storing data, data length, read type.
+ * @param  bID device addresss
+ * @param  wAddr register address
+ * @param  pData pointer of where to store data
+ * @param  bLen length of data
+ * @param  dwTimeOut time to wait for response? (unsure)
+ * @param  bWriteType write type (single, broadcast, stack)
+ * @retval bytes received
+ */
 int SpiReadReg(BYTE bID, uint16_t wAddr, uint16_t *pData, BYTE bLen, uint32_t dwTimeOut, BYTE bWriteType)
 {
     // device address, register start address, byte frame pointer to store data, data length, read type (single, broadcast, stack)
@@ -454,6 +475,12 @@ const uint16_t crc16_table[256] = {0x0000, 0xC0C1, 0xC181, 0x0140, 0xC301,
                                    0x8C41, 0x4400, 0x84C1, 0x8581, 0x4540, 0x8701, 0x47C0, 0x4680, 0x8641,
                                    0x8201, 0x42C0, 0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040};
 
+/**
+ * @brief  Calculate the CRC16 of the data. Used for error checking.
+ * @param  pBuf pointer to data
+ * @param  nLen length of data
+ * @retval CRC value
+ */
 uint32_t SpiCRC16(uint16_t *pBuf, int nLen)
 {
     uint32_t wCRC = 0xFFFF;
@@ -475,7 +502,10 @@ uint32_t SpiCRC16(uint16_t *pBuf, int nLen)
 // MISCELLANEOUS FUNCTIONS
 //************************
 
-// Made by SL
+/**
+ * @brief  Initialize the GPIO for the MOSI pin. Specific to the STM32F7 chip at the moment, change configuration for F4 chip eventually.
+ * @retval None
+ */
 void MosiGpioInit()
 {
     // Enable clock for GPIOG
@@ -488,6 +518,10 @@ void MosiGpioInit()
     GPIOC->PUPDR &= ~((1 << 24) | (1 << 25)); // Pin PA5 (bits 25:24) are 0:0 --> no pull up or pulldown
 }
 
+/**
+ * @brief  Disable the timeout for the bq79600. Disable timeout 600 and 616.
+ * @retval None
+ */
 void SpiDisableTimeout_600_616(void)
 {
     // Disable timeout 600
@@ -496,6 +530,10 @@ void SpiDisableTimeout_600_616(void)
     SpiWriteReg(0, COMM_CTRL, 0x00, 1, FRMWRT_STK_W);
 }
 
+/**
+ * @brief  Helper function through calculation.
+ * @retval None
+ */
 float Complement(uint16_t rawData, float multiplier)
 {
     return -1 * (~rawData + 1) * multiplier;
@@ -509,6 +547,11 @@ float Complement(uint16_t rawData, float multiplier)
 //     return 1;
 // }
 
+/**
+ * @brief  Helper function to delay in microseconds. Made configured for STM32F7 chip.
+ * @param   us delay in microseconds
+ * @retval None
+ */
 void delayus(uint16_t us) // FROM SL: New version of delayus
 {
     __HAL_TIM_SET_COUNTER(&htim1, 0); // set the counter value a 0
@@ -516,6 +559,11 @@ void delayus(uint16_t us) // FROM SL: New version of delayus
         ; // wait for the counter to reach the us input in the parameter
 }
 
+/**
+ * @brief  Helper function to convert voltage to byte. May be uneccesary.
+ * @param  volt voltage to be converted
+ * @retval byte value
+ */
 uint16_t volt2Byte(float volt) // FROM SL: Take out? May be uneccesary
 {
     return (uint16_t) ~((int16_t)((-volt / 0.00019073) - 1.0));
