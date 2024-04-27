@@ -24,6 +24,8 @@
 #include <stdio.h>
 #include "bq79616.h"
 #include "bq79600.h"
+#include <stdint.h>
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,12 +58,6 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 uint16_t adcValue[16];
-const uint8_t EEPROM_READ = 0b00000011;
-const uint8_t EEPROM_WRITE = 0b00000010;
-const uint8_t EEPROM_WRDI = 0b00000100;
-const uint8_t EEPROM_WREN = 0b00000110;
-const uint8_t EEPROM_RDSR = 0b00000101;
-const uint8_t EEPROM_WRSR = 0b00000001;
 
 /* USER CODE END PV */
 
@@ -90,9 +86,6 @@ static void MX_TIM1_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  char spi_buf[20];
-  char uart_buf[50];
-  int uart_buf_len;
 
   /* USER CODE END 1 */
 
@@ -307,12 +300,150 @@ int main(void)
   // Starting timer for delayus in bq79616.c
   HAL_TIM_Base_Start(&htim1);
 
+  // FSM Creation
+
+  // Creating variables
+  bool precharge_flag;
+  bool idle_flag;
+  bool charge_flag;
+  bool discharge_flag;
+  bool fault_flag;
+
+  char uart_buf[50];
+  int uart_buf_len;
+
+  enum States
+  {
+    INIT,
+    PRECHARGE,
+    IDLE,
+    CHARGE,
+    DISCHARGE,
+    FAULT
+  } state = INIT;
+
+  void BMS_Tick()
+  {
+    // Transistions
+    switch (state)
+    {
+    case INIT:
+      if (precharge_flag)
+      {
+        state = PRECHARGE;
+      }
+      break;
+
+    case PRECHARGE:
+      if (idle_flag)
+      {
+        state = IDLE;
+      }
+      else if (fault_flag)
+      {
+        state = FAULT;
+      }
+      break;
+
+    case IDLE:
+      if (charge_flag)
+      {
+        state = CHARGE;
+      }
+      else if (discharge_flag)
+      {
+        state = DISCHARGE;
+      }
+      else if (fault_flag)
+      {
+        state = FAULT;
+      }
+      break;
+
+    case CHARGE:
+      if (idle_flag)
+      {
+        state = IDLE;
+      }
+      else if (fault_flag)
+      {
+        state = FAULT;
+      }
+      break;
+
+    case DISCHARGE:
+      if (idle_flag)
+      {
+        state = IDLE;
+      }
+      else if (fault_flag)
+      {
+        state = FAULT;
+      }
+      break;
+
+    case FAULT:
+      strcpy((char *)uart_buf, "FAULT\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+
+    default:
+      strcpy((char *)uart_buf, "DEFAULT\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+    }
+
+    // Actions
+    switch (state)
+    {
+    case INIT:
+      strcpy((char *)uart_buf, "INIT\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+
+    case PRECHARGE:
+      strcpy((char *)uart_buf, "PRECHARGE\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+
+    case IDLE:
+      strcpy((char *)uart_buf, "IDLE\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+
+    case CHARGE:
+      strcpy((char *)uart_buf, "CHARGE\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+
+    case DISCHARGE:
+      strcpy((char *)uart_buf, "DISCHARGE\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+
+    case FAULT:
+      break;
+
+    default:
+      break;
+    }
+  }
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    BMS_Tick();
+    HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
