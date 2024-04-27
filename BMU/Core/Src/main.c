@@ -303,27 +303,6 @@ int main(void)
       HAL_ADC_Stop(&hadc1);
     }
   }
-  // CS pin should default high
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
-
-  // Say something to TERMINAL
-  uart_buf_len = sprintf(uart_buf, "SPI TEST\r\n");
-  HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
-
-  // Enable write enable latch
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
-  HAL_SPI_Transmit(&hspi3, (uint8_t *)&EEPROM_WREN, 1, HAL_MAX_DELAY);
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
-
-  // Read status register
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
-  HAL_SPI_Transmit(&hspi3, (uint8_t *)&EEPROM_RDSR, 1, HAL_MAX_DELAY);
-  HAL_SPI_Receive(&hspi3, (uint8_t *)spi_buf, 1, 100);
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
-
-  // Print out status register
-  uart_buf_len = sprintf(uart_buf, "Status: 0x%02x\r\n", (unsigned int)spi_buf[0]);
-  HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
 
   // Starting timer for delayus in bq79616.c
   HAL_TIM_Base_Start(&htim1);
@@ -334,8 +313,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    //    CollectADCData();
-    //    HAL_Delay(100);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
