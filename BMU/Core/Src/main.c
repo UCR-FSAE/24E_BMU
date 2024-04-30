@@ -444,6 +444,7 @@ int main(void)
   {
     BMS_Tick();
     HAL_Delay(1000);
+    // Testing
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
