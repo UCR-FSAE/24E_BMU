@@ -1,0 +1,35 @@
+:name: STM32F4_Test
+
+using sysbus
+
+$name_tx?="stm32f4_tx"
+$name_rx?="stm32f4_rx"
+
+$bin_tx?=@STM32CubeIDE/workspace_1.15.0/F4_BMU/Debug/F4_BMU.elf
+$bin_rx?=@STM32CubeIDE/workspace_1.15.0/F4_RX_DUMMY/Debug/F4_RX_DUMMY.elf
+
+emulation CreateUARTHub "uarthub"
+
+mach create $name_tx
+machine LoadPlatformDescription @platforms/cpus/stm32f4.repl
+
+connector Connect usart1 uarthub
+showAnalyzer usart1
+
+mach create $name_rx
+machine LoadPlatformDescription @platforms/cpus/stm32f4.repl
+
+connector Connect usart1 uarthub
+showAnalyzer usart2
+
+macro reset
+"""
+    mach set 0
+    sysbus LoadELF $bin_tx
+
+    mach set 1
+    sysbus LoadELF $bin_rx
+"""
+
+runMacro $reset
+
