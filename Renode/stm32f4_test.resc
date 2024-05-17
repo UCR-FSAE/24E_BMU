@@ -5,8 +5,8 @@ using sysbus
 $name_tx?="stm32f4_tx"
 $name_rx?="stm32f4_rx"
 
-$bin_tx?=@STM32CubeIDE/workspace_1.15.0/F4_BMU/Debug/F4_BMU.elf
-$bin_rx?=@STM32CubeIDE/workspace_1.15.0/F4_RX_DUMMY/Debug/F4_RX_DUMMY.elf
+$bin_tx?=@https://github.com/UCR-FSAE/24E_BMU/raw/aryab/F4_BMU_dev/Renode/F4_TX.elf
+$bin_rx?=@https://github.com/UCR-FSAE/24E_BMU/raw/aryab/F4_BMU_dev/Renode/F4_RX.elf
 
 emulation CreateUARTHub "uarthub"
 
