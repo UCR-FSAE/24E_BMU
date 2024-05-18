@@ -76,7 +76,219 @@ static void MX_TIM1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+  // FSM Creation
 
+  // Creating variables
+  bool init_flag;
+  bool low_idle_flag;
+  bool high_idle_flag;
+  bool ready_flag;
+  bool discharge_flag;
+  bool charging_flag;
+  bool fault_flag;
+
+  char uart_buf[50];
+  int uart_buf_len;
+
+  // Creating functions
+  void balanceCells(){}
+  bool CAN_CheckStart(){}
+
+  void SpiReadReg_GetVolt(){}
+  void SpiReadReg_GetTemp(){}
+  void SpiReadReg_GetCurrent(){}
+
+  void CAN_SendVoltVCU(){}
+  void CAN_SendTempVCU(){}
+  void CAN_SendCurrentVCU(){}
+
+  void SpiWriteReg_SetVolt(){}
+  void SpiWriteReg_SetTemp(){}
+  void SpiWriteReg_SetCurrent(){}
+
+  enum States
+  {
+    INIT,
+    LOW_IDLE,
+    HIGH_IDLE,
+    READY,
+    DISCHARGE,
+    CHARGING,
+    FAULT
+  } state = INIT;
+
+  void BMS_Tick()
+  {
+    // Transistions
+    switch (state)
+    {
+
+    case INIT:
+      // call wake ping function, spi clear comm, and auto address function
+      SpiWake79600();
+      SpiCommClear79600();
+      SpiAutoAddress();
+
+      // going from init --> low idle
+      state = LOW_IDLE;
+      break;
+
+    case LOW_IDLE:
+    // balancing cells, waiting to boot message from VCU via CAN, 
+    // also ping to switch to charging state
+      if (charging_flag)
+      {
+        state = CHARGING;
+      }
+      else if (fault_flag)
+      {
+        state = FAULT;
+      }
+      else if (CAN_CheckStart())
+      {
+        state = HIGH_IDLE;
+      }
+      break;
+
+    case HIGH_IDLE:
+    // balancing cells, also ping to switch to charging state at higher frequency and 
+    // constantly send message to get values for temperature, voltage, and current 
+    // (Make dummy function for each that will call SpiReadReg in a specific way basically), 
+    // then send those values through CAN (Make dummy function for CAN message sending like [CAN_SendVoltVCU]) 
+      if (charging_flag)
+      {
+        state = CHARGING;
+      }
+      else if (ready_flag)
+      {
+        state = READY;
+      }
+      else if (fault_flag)
+      {
+        state = FAULT;
+      }
+      break;
+
+    case READY:
+    // Able to discharge, when car is running but no acceleration
+      if (discharge_flag)
+      {
+        state = DISCHARGE;
+      }
+      else if (high_idle_flag)
+      {
+        state = HIGH_IDLE;
+      }
+      else if (fault_flag)
+      {
+          state = FAULT;
+      }
+    break;
+
+    case DISCHARGE:
+    // currently accelerating
+      if (ready_flag)
+      {
+        state = READY;
+      }
+      else if (fault_flag)
+      {
+        state = FAULT;
+      }
+      break;
+
+    case CHARGING:
+    // Constantly send message to actively cell balance while charging is happening 
+    // (Make dummy function for it that will call SpiWriteReg)
+      if (low_idle_flag)
+      {
+        state = LOW_IDLE;
+      }
+      else if (high_idle_flag)
+      {
+        state = HIGH_IDLE;
+      }
+      else if (fault_flag)
+      {
+        state = FAULT;
+      }
+      break;
+
+    case FAULT:
+    // If at any point fault flag set, switch and stop working, send fault message via CAN to VCU
+      strcpy((char *)uart_buf, "FAULT\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+
+    default:
+      strcpy((char *)uart_buf, "DEFAULT\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+    }
+
+    // Actions
+    switch (state)
+    {
+    case INIT:
+      strcpy((char *)uart_buf, "INIT\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+
+    case LOW_IDLE:
+      balanceCells();
+      strcpy((char *)uart_buf, "LOW IDLE\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+        
+    case HIGH_IDLE:
+      balanceCells();
+
+      SpiReadReg_GetVolt();
+      SpiReadReg_GetTemp();
+      SpiReadReg_GetCurrent();
+
+      CAN_SendVoltVCU();
+      CAN_SendTempVCU();
+      CAN_SendCurrentVCU();
+
+      strcpy((char *)uart_buf, "HIGH IDLE\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+
+    case READY:
+      strcpy((char *)uart_buf, "READY\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+
+    case DISCHARGE:
+      strcpy((char *)uart_buf, "DISCHARGE\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+
+    case CHARGING:
+      SpiWriteReg_SetTemp();
+      SpiWriteReg_SetVolt();
+      SpiWriteReg_SetCurrent();
+
+      strcpy((char *)uart_buf, "CHARGING\r\n");
+      uart_buf_len = strlen((char *)uart_buf);
+      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+      break;
+  
+    case FAULT:
+      break;
+
+    default:
+      break;
+    }
+  }
 /* USER CODE END 0 */
 
 /**
@@ -299,145 +511,7 @@ int main(void)
 
   // Starting timer for delayus in bq79616.c
   HAL_TIM_Base_Start(&htim1);
-
-  // FSM Creation
-
-  // Creating variables
-  bool precharge_flag;
-  bool idle_flag;
-  bool charge_flag;
-  bool discharge_flag;
-  bool fault_flag;
-
-  char uart_buf[50];
-  int uart_buf_len;
-
-  enum States
-  {
-    INIT,
-    PRECHARGE,
-    IDLE,
-    CHARGE,
-    DISCHARGE,
-    FAULT
-  } state = INIT;
-
-  void BMS_Tick()
-  {
-    // Transistions
-    switch (state)
-    {
-    case INIT:
-      if (precharge_flag)
-      {
-        state = PRECHARGE;
-      }
-      break;
-
-    case PRECHARGE:
-      if (idle_flag)
-      {
-        state = IDLE;
-      }
-      else if (fault_flag)
-      {
-        state = FAULT;
-      }
-      break;
-
-    case IDLE:
-      if (charge_flag)
-      {
-        state = CHARGE;
-      }
-      else if (discharge_flag)
-      {
-        state = DISCHARGE;
-      }
-      else if (fault_flag)
-      {
-        state = FAULT;
-      }
-      break;
-
-    case CHARGE:
-      if (idle_flag)
-      {
-        state = IDLE;
-      }
-      else if (fault_flag)
-      {
-        state = FAULT;
-      }
-      break;
-
-    case DISCHARGE:
-      if (idle_flag)
-      {
-        state = IDLE;
-      }
-      else if (fault_flag)
-      {
-        state = FAULT;
-      }
-      break;
-
-    case FAULT:
-      strcpy((char *)uart_buf, "FAULT\r\n");
-      uart_buf_len = strlen((char *)uart_buf);
-      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
-      break;
-
-    default:
-      strcpy((char *)uart_buf, "DEFAULT\r\n");
-      uart_buf_len = strlen((char *)uart_buf);
-      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
-      break;
-    }
-
-    // Actions
-    switch (state)
-    {
-    case INIT:
-      strcpy((char *)uart_buf, "INIT\r\n");
-      uart_buf_len = strlen((char *)uart_buf);
-      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
-      break;
-
-    case PRECHARGE:
-      strcpy((char *)uart_buf, "PRECHARGE\r\n");
-      uart_buf_len = strlen((char *)uart_buf);
-      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
-      break;
-
-    case IDLE:
-      strcpy((char *)uart_buf, "IDLE\r\n");
-      uart_buf_len = strlen((char *)uart_buf);
-      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
-      break;
-
-    case CHARGE:
-      strcpy((char *)uart_buf, "CHARGE\r\n");
-      uart_buf_len = strlen((char *)uart_buf);
-      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
-      break;
-
-    case DISCHARGE:
-      strcpy((char *)uart_buf, "DISCHARGE\r\n");
-      uart_buf_len = strlen((char *)uart_buf);
-      HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
-      break;
-
-    case FAULT:
-      break;
-
-    default:
-      break;
-    }
-  }
-
   /* USER CODE END 2 */
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
