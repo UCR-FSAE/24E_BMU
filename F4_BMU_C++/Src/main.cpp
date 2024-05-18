@@ -106,9 +106,13 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    BMU* HR24E = new BMU(hspi1);
+    uint8_t data[4] = {0x02, 0xB7, 0x78, 0xBC};
+	  BMU* HR24E = new BMU();
 
 	  HR24E->Wake79600();
+	  HR24E->WriteFrame(0x01, 0x0100, data, 4, FRMWRT_SGL_W);
+
+	  HR24E->ShutDown79600();
   }
   /* USER CODE END 3 */
 }
