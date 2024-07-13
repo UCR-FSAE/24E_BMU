@@ -90,10 +90,26 @@ static void MX_TIM1_Init(void);
   char uart_buf[50];
   int uart_buf_len;
 
-  // Creating functions
+  // Creating helper functions
+  /**
+   * @brief  Call SpiWriteReg() to actively make BQ's balance cells.
+   * @param  none
+   * @retval None
+   */
   void balanceCells(){}
+
+  /**
+   * @brief  Checks for message from VCU through CAN about starting car.
+   * @param  none
+   * @retval Bool value indicating whether car is started or not.
+   */
   bool CAN_CheckStart(){}
 
+  /**
+   * @brief  Send message to BQ's to get voltage values of battery cells.
+   * @param  None
+   * @retval data type tbd, list of voltage values from all of the cells in the BMS.
+   */
   void SpiReadReg_GetVolt(){}
   void SpiReadReg_GetTemp(){}
   void SpiReadReg_GetCurrent(){}
@@ -106,6 +122,7 @@ static void MX_TIM1_Init(void);
   void SpiWriteReg_SetTemp(){}
   void SpiWriteReg_SetCurrent(){}
 
+  // FSM/Tick Function
   enum States
   {
     INIT,
